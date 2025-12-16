@@ -6,7 +6,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import { Plus, Heart, Syringe, AlertCircle, Activity } from 'lucide-react';
-import { mockHealthRecords, mockAnimals, mockAlerts } from '../../utils/mockData';
+import { mockHealthRecords, mockAnimals, mockAlerts } from '../../mock/mockData';
 import {
   Select,
   SelectContent,

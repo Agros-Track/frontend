@@ -5,7 +5,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Plus, UtensilsCrossed, TrendingUp } from 'lucide-react';
-import { mockFeedRecords, mockFincas } from '../../utils/mockData';
+import { mockFeedRecords, mockFincas } from '../../mock/mockData';
 import {
   Select,
   SelectContent,

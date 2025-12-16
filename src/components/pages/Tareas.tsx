@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
-import { Plus, CheckSquare, Clock, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
-import { mockTasks, mockAlerts } from '../../utils/mockData';
+import { Plus, CheckSquare, Clock, CheckCircle2, XCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { mockAlerts } from '../../mock/mockData';
 import {
   Select,
   SelectContent,
@@ -15,13 +15,92 @@ import {
   SelectValue,
 } from '../ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { taskService, Task } from '../../services/taskService';
+import { toast } from 'sonner';
 
 export function Tareas() {
   const [showForm, setShowForm] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const pendientes = mockTasks.filter(t => t.status === 'pendiente');
-  const enProceso = mockTasks.filter(t => t.status === 'en-proceso');
-  const completadas = mockTasks.filter(t => t.status === 'completado');
+  // Form state
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
+  const [dueDate, setDueDate] = useState('');
+  const [assignedTo, setAssignedTo] = useState('');
+
+  useEffect(() => {
+    loadTasks();
+  }, []);
+
+  const loadTasks = async () => {
+    try {
+      setIsLoading(true);
+      const data = await taskService.getTasks();
+      console.log("✅ Tareas cargadas:", data);
+      setTasks(data);
+    } catch (error: any) {
+      console.error("❌ Error cargando tareas:", error);
+      toast.error("Error al cargar las tareas");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!title || !dueDate || !assignedTo) {
+      toast.error("Por favor completa todos los campos obligatorios");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const newTask = await taskService.createTask({
+        title,
+        description,
+        status: 'pending',
+        priority,
+        dueDate,
+        assignedTo,
+        farmId: localStorage.getItem('farmId') || 'default-farm'
+      });
+
+      setTasks([newTask, ...tasks]);
+      toast.success("Tarea creada exitosamente");
+
+      // Reset form
+      setTitle('');
+      setDescription('');
+      setPriority('medium');
+      setDueDate('');
+      setAssignedTo('');
+      setShowForm(false);
+    } catch (error) {
+      console.error("❌ Error creando tarea:", error);
+      toast.error("Error al crear la tarea");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdateStatus = async (id: string, status: Task['status']) => {
+    try {
+      const updatedTask = await taskService.updateTask(id, { status });
+      setTasks(tasks.map(t => t.id === id ? updatedTask : t));
+      toast.success("Estado actualizado");
+    } catch (error) {
+      console.error("❌ Error actualizando tarea:", error);
+      toast.error("Error al actualizar la tarea");
+    }
+  };
+
+  const pendientes = tasks.filter(t => t.status === 'pending');
+  const enProceso = tasks.filter(t => t.status === 'in_progress');
+  const completadas = tasks.filter(t => t.status === 'completed');
 
   return (
     <div className="space-y-8">
@@ -33,7 +112,7 @@ export function Tareas() {
             Gestiona las actividades diarias y mantén el control de tus pendientes
           </p>
         </div>
-        <Button 
+        <Button
           className="bg-[var(--orange-soft)] hover:bg-[var(--orange-soft)]/90 text-white"
           onClick={() => setShowForm(!showForm)}
         >

@@ -5,7 +5,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Check, Edit2, Plus, Trash2 } from 'lucide-react';
-import { mockPlans, Plan } from '../../utils/mockData';
+import { mockPlans, Plan } from '../../mock/mockData';
 import { toast } from 'sonner';
 
 export function PlansPage() {

@@ -1,4 +1,3 @@
-
 import { Search } from "lucide-react";
 import { SidebarTrigger } from "../../ui/sidebar";
 import { Separator } from "../../ui/separator";

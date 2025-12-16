@@ -1,6 +1,5 @@
-
 import { MessageSquare } from "lucide-react";
-import { supportTickets } from "../../services/mockData";
+import { supportTickets } from "../../mock/dashboard.mock";
 import { Button } from "../../components/ui/button";
 import {
     Card,

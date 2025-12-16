@@ -1,4 +1,3 @@
-
 export const dashboardMetrics = {
     activeTenants: 142,
     suspendedTenants: 8,
@@ -213,4 +212,3 @@ export const supportTickets = [
         createdAt: "Hace 1 día",
     }
 ];
-

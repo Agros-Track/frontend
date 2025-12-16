@@ -16,7 +16,7 @@ import {
   FileText,
   TrendingUp
 } from 'lucide-react';
-import { mockAnimals, mockHealthRecords, mockFeedRecords } from '../../utils/mockData';
+import { mockAnimals, mockHealthRecords, mockFeedRecords } from '../../mock/mockData';
 import {
   LineChart,
   Line,

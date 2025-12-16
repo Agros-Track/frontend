@@ -3,7 +3,7 @@ import { Badge } from "../../ui/badge"
 import { Button } from "../../ui/button"
 import { Link } from "react-router"
 import { Syringe, Heart, AlertCircle, Activity, Calendar, ClipboardList, Stethoscope } from "lucide-react"
-import { mockVaccines, mockDiseaseRecords, mockAnimals, mockAlerts } from "../../../utils/mockData"
+import { mockVaccines, mockDiseaseRecords, mockAnimals, mockAlerts } from "../../../mock/mockData"
 
 export function VeterinarioDashboard() {
   const upcomingVaccines = mockVaccines.filter((v) => {

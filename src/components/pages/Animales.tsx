@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -9,9 +9,9 @@ import {
   Filter,
   Eye,
   MapPin,
-  MoreVertical
+  MoreVertical,
+  Loader2
 } from 'lucide-react';
-import { mockAnimals } from '../../utils/mockData';
 import { Link } from 'react-router';
 import {
   Select,
@@ -20,17 +20,47 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
+import { animalService, Animal } from '../../services/animalService';
+import { toast } from 'sonner';
+
+import { CreateAnimalModal } from './CreateAnimalModal';
 
 export function Animales() {
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('todos');
   const [statusFilter, setStatusFilter] = useState('todos');
+  const [animals, setAnimals] = useState<Animal[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  const filteredAnimals = mockAnimals.filter(animal => {
-    const matchesSearch = animal.arete.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  // Cargar animales desde el backend
+  useEffect(() => {
+    loadAnimals();
+  }, []);
+
+  const loadAnimals = async () => {
+    try {
+      setIsLoading(true);
+      const data = await animalService.getAnimals();
+      console.log("✅ Animales cargados:", data);
+      setAnimals(data);
+    } catch (error: any) {
+      console.error("❌ Error cargando animales:", error);
+      toast.error("Error al cargar los animales");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCreateSuccess = () => {
+    loadAnimals(); // Refrescar lista
+  };
+
+  const filteredAnimals = animals.filter(animal => {
+    const matchesSearch = animal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       animal.breed.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = typeFilter === 'todos' || animal.type === typeFilter;
-    const matchesStatus = statusFilter === 'todos' || animal.status === statusFilter;
+    const matchesType = typeFilter === 'todos' || animal.species === typeFilter;
+    const matchesStatus = statusFilter === 'todos' || animal.healthStatus === statusFilter;
 
     return matchesSearch && matchesType && matchesStatus;
   });
@@ -71,29 +101,38 @@ export function Animales() {
             Gestiona y monitorea todos los animales de tus fincas
           </p>
         </div>
-        <Button className="bg-[var(--orange-soft)] hover:bg-[var(--orange-soft)]/90 text-white">
+        <Button
+          className="bg-[var(--orange-soft)] hover:bg-[var(--orange-soft)]/90 text-white"
+          onClick={() => setIsCreateModalOpen(true)}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Registrar Animal
         </Button>
       </div>
 
+      <CreateAnimalModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+        onSuccess={handleCreateSuccess}
+      />
+
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4 shadow-md border border-border">
           <p className="text-muted-foreground mb-1">Total</p>
-          <h3 className="text-primary">{mockAnimals.length}</h3>
+          <h3 className="text-primary">{isLoading ? "..." : animals.length}</h3>
         </Card>
         <Card className="p-4 shadow-md border border-border">
-          <p className="text-muted-foreground mb-1">Vacas</p>
-          <h3 className="text-primary">{mockAnimals.filter(a => a.type === 'vaca').length}</h3>
+          <p className="text-muted-foreground mb-1">Ganado</p>
+          <h3 className="text-primary">{isLoading ? "..." : animals.filter(a => a.species === 'bovino').length}</h3>
         </Card>
         <Card className="p-4 shadow-md border border-border">
-          <p className="text-muted-foreground mb-1">Terneros</p>
-          <h3 className="text-primary">{mockAnimals.filter(a => a.type === 'ternero').length}</h3>
+          <p className="text-muted-foreground mb-1">Peso Promedio</p>
+          <h3 className="text-primary">{isLoading ? "..." : Math.round(animals.reduce((acc, a) => acc + a.weight, 0) / animals.length || 0)} kg</h3>
         </Card>
         <Card className="p-4 shadow-md border border-border">
-          <p className="text-muted-foreground mb-1">Activos</p>
-          <h3 className="text-primary">{mockAnimals.filter(a => a.status === 'activo').length}</h3>
+          <p className="text-muted-foreground mb-1">Saludables</p>
+          <h3 className="text-primary">{isLoading ? "..." : animals.filter(a => a.healthStatus === 'healthy' || a.healthStatus === 'saludable').length}</h3>
         </Card>
       </div>
 
@@ -143,7 +182,7 @@ export function Animales() {
       <div>
         <div className="mb-4 flex items-center justify-between">
           <p className="text-muted-foreground">
-            Mostrando {filteredAnimals.length} de {mockAnimals.length} animales
+            Mostrando {filteredAnimals.length} animales
           </p>
         </div>
 
@@ -151,68 +190,81 @@ export function Animales() {
         <div className="hidden md:block">
           <Card className="overflow-hidden shadow-md border border-border">
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-muted/50">
-                  <tr>
-                    <th className="px-6 py-4 text-left">Arete</th>
-                    <th className="px-6 py-4 text-left">Tipo</th>
-                    <th className="px-6 py-4 text-left">Raza</th>
-                    <th className="px-6 py-4 text-left">Edad</th>
-                    <th className="px-6 py-4 text-left">Ubicación</th>
-                    <th className="px-6 py-4 text-left">Estado</th>
-                    <th className="px-6 py-4 text-left">Peso</th>
-                    <th className="px-6 py-4 text-right">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {filteredAnimals.map((animal) => (
-                    <tr key={animal.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-6 py-4">
-                        <span className="text-primary">{animal.arete}</span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <Badge variant="outline" className="capitalize">
-                          {animal.type}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span>{animal.breed}</span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="text-muted-foreground">{animal.age}</span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <MapPin className="h-3 w-3" />
-                          <span>{animal.lote}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        {animal.state && (
-                          <Badge variant="secondary" className={getStateColor(animal.state)}>
-                            {getStateName(animal.state)}
-                          </Badge>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span>{animal.weight ? `${animal.weight} kg` : '-'}</span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <Link to={`${animal.id}`}>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                          <Button variant="ghost" size="sm">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
+              {isLoading ? (
+                <div className="flex items-center justify-center p-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <span className="ml-2 text-muted-foreground">Cargando animales...</span>
+                </div>
+              ) : filteredAnimals.length === 0 ? (
+                <div className="flex flex-col items-center justify-center p-12 text-center">
+                  <p className="text-muted-foreground mb-2">No se encontraron animales</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={loadAnimals}
+                  >
+                    Recargar
+                  </Button>
+                </div>
+              ) : (
+                <table className="w-full">
+                  <thead className="bg-muted/50">
+                    <tr>
+                      <th className="px-6 py-4 text-left">ID</th>
+                      <th className="px-6 py-4 text-left">Nombre</th>
+                      <th className="px-6 py-4 text-left">Especie</th>
+                      <th className="px-6 py-4 text-left">Raza</th>
+                      <th className="px-6 py-4 text-left">Fecha Nac.</th>
+                      <th className="px-6 py-4 text-left">Estado</th>
+                      <th className="px-6 py-4 text-left">Peso</th>
+                      <th className="px-6 py-4 text-right">Acciones</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {filteredAnimals.map((animal) => (
+                      <tr key={animal.id} className="hover:bg-muted/30 transition-colors">
+                        <td className="px-6 py-4">
+                          <span className="text-primary font-mono text-sm">{animal.id.substring(0, 8)}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="font-medium">{animal.name}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <Badge variant="outline" className="capitalize">
+                            {animal.species}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span>{animal.breed}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-muted-foreground">{new Date(animal.birthDate).toLocaleDateString()}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <Badge variant="secondary" className={getStateColor(animal.healthStatus)}>
+                            {getStateName(animal.healthStatus)}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span>{animal.weight ? `${animal.weight} kg` : '-'}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-end gap-2">
+                            <Link to={`${animal.id}`}>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </Card>
         </div>
@@ -223,9 +275,9 @@ export function Animales() {
             <Card key={animal.id} className="p-4 shadow-md border border-border">
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h4 className="text-primary mb-1">{animal.arete}</h4>
+                  <h4 className="text-primary mb-1">{animal.name}</h4>
                   <Badge variant="outline" className="capitalize">
-                    {animal.type} • {animal.breed}
+                    {animal.species} • {animal.breed}
                   </Badge>
                 </div>
                 <Button variant="ghost" size="icon">
@@ -235,27 +287,29 @@ export function Animales() {
 
               <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Edad:</span>
-                  <span>{animal.age}</span>
+                  <span className="text-muted-foreground">Nacimiento:</span>
+                  <span>{new Date(animal.birthDate).toLocaleDateString()}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Ubicación:</span>
-                  <span className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
-                    {animal.lote}
-                  </span>
-                </div>
+                {animal.farmId && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Farm ID:</span>
+                    <span className="flex items-center gap-1">
+                      <MapPin className="h-3 w-3" />
+                      {animal.farmId}
+                    </span>
+                  </div>
+                )}
                 {animal.weight && (
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Peso:</span>
                     <span>{animal.weight} kg</span>
                   </div>
                 )}
-                {animal.state && (
+                {animal.healthStatus && (
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Estado:</span>
-                    <Badge variant="secondary" className={getStateColor(animal.state)}>
-                      {getStateName(animal.state)}
+                    <Badge variant="secondary" className={getStateColor(animal.healthStatus)}>
+                      {getStateName(animal.healthStatus)}
                     </Badge>
                   </div>
                 )}

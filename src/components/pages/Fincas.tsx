@@ -13,7 +13,7 @@ import {
   DialogTitle
 } from '../ui/dialog';
 import { MapPin, Plus, MoreVertical, Users } from 'lucide-react';
-import { mockFincas } from '../../utils/mockData';
+import { mockFincas } from '../../mock/mockData';
 import { toast } from 'sonner';
 
 export function Fincas() {

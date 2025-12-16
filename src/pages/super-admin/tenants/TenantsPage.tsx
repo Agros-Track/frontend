@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Plus, Search, MoreHorizontal, Eye, Edit2, Ban, Trash2 } from "lucide-react";
-import { getTenants, createTenant } from "../../../services/tenant.service";
+import * as tenantService from "../../../services/tenant.service";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { Badge } from "../../../components/ui/badge";
@@ -23,40 +23,71 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar";
 import { CreateTenantModal } from "./CreateTenantModal";
 import { Link } from "react-router";
+import { toast } from "sonner";
+import type { Tenant } from "../../../services/tenant.service";
 
 export function TenantsPage() {
-    console.log("🔥 TenantsPage se montó");
-
     const [searchTerm, setSearchTerm] = useState("");
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [tenants, setTenants] = useState<any[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [tenants, setTenants] = useState<Tenant[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // 🔹 CARGAR TENANTS DESDE BACKEND
     useEffect(() => {
-        setLoading(true);
-        getTenants()
-            .then((data) => {
-                setTenants(data);
-            })
-            .catch((err) => {
-                console.error("Error cargando tenants:", err);
-            })
-            .finally(() => setLoading(false));
+        loadTenants();
     }, []);
 
-    // 🔹 CREAR TENANT REAL
-    const handleCreateTenant = async (newTenant: any) => {
+    const loadTenants = async () => {
         try {
-            const createdTenant = await createTenant(newTenant);
-            setTenants((prev) => [createdTenant, ...prev]);
-            setIsCreateModalOpen(false);
+            setIsLoading(true);
+            const data = await tenantService.getTenants();
+            setTenants(data);
         } catch (error) {
-            console.error("Error creando tenant:", error);
+            console.error('Error loading tenants:', error);
+            toast.error("Error al cargar los tenants.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const filteredTenants = tenants.filter((tenant) =>
+    const handleCreateTenant = async (payload: any) => {
+        try {
+            const newTenant = await tenantService.createTenant(payload);
+            setTenants([newTenant, ...tenants]);
+            setIsCreateModalOpen(false);
+            toast.success("Tenant creado exitosamente.");
+        } catch (error) {
+            console.error('Error creating tenant:', error);
+            throw error; // Re-lanzar para que el modal lo maneje
+        }
+    };
+
+    const handleDeleteTenant = async (id: string) => {
+        if (!confirm("¿Estás seguro de eliminar este tenant?")) return;
+        
+        try {
+            await tenantService.deleteTenant(id);
+            setTenants(tenants.filter(t => t.id !== id));
+            toast.success("Tenant eliminado exitosamente.");
+        } catch (error) {
+            console.error('Error deleting tenant:', error);
+            toast.error("Error al eliminar el tenant.");
+        }
+    };
+
+    const handleToggleStatus = async (id: string, currentStatus: string) => {
+        const newStatus = currentStatus === "active" ? "suspended" : "active";
+        
+        try {
+            const updatedTenant = await tenantService.toggleTenantStatus(id, newStatus);
+            setTenants(tenants.map(t => t.id === id ? updatedTenant : t));
+            toast.success(`Tenant ${newStatus === "active" ? "activado" : "suspendido"} exitosamente.`);
+        } catch (error) {
+            console.error('Error toggling tenant status:', error);
+            toast.error("Error al actualizar el estado del tenant.");
+        }
+    };
+
+    const filteredTenants = tenants.filter(tenant =>
         tenant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         tenant.subdomain.toLowerCase().includes(searchTerm.toLowerCase()) ||
         tenant.nit.includes(searchTerm)
@@ -71,10 +102,7 @@ export function TenantsPage() {
                         Gestiona las empresas y suscripciones de la plataforma.
                     </p>
                 </div>
-                <Button
-                    onClick={() => setIsCreateModalOpen(true)}
-                    className="bg-agro-green-600 hover:bg-agro-green-700"
-                >
+                <Button onClick={() => setIsCreateModalOpen(true)} className="bg-agro-green-600 hover:bg-agro-green-700">
                     <Plus className="mr-2 h-4 w-4" /> Crear Tenant
                 </Button>
             </div>
@@ -111,23 +139,26 @@ export function TenantsPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {loading && (
+                        {isLoading ? (
                             <TableRow>
-                                <TableCell colSpan={7} className="text-center py-6">
+                                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                                     Cargando tenants...
                                 </TableCell>
                             </TableRow>
-                        )}
-
-                        {!loading && filteredTenants.map((tenant) => (
+                        ) : filteredTenants.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                                    No se encontraron tenants
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            filteredTenants.map((tenant) => (
                             <TableRow key={tenant.id}>
                                 <TableCell>
                                     <div className="flex items-center gap-3">
                                         <Avatar className="h-9 w-9 rounded-lg">
                                             <AvatarImage src={tenant.logo} />
-                                            <AvatarFallback>
-                                                {tenant.name.substring(0, 2)}
-                                            </AvatarFallback>
+                                            <AvatarFallback>{tenant.name.substring(0, 2)}</AvatarFallback>
                                         </Avatar>
                                         <div className="flex flex-col">
                                             <span className="font-medium">{tenant.name}</span>
@@ -135,52 +166,37 @@ export function TenantsPage() {
                                         </div>
                                     </div>
                                 </TableCell>
-
-                                <TableCell className="font-mono text-xs">
-                                    {tenant.subdomain}
-                                </TableCell>
-
+                                <TableCell className="font-mono text-xs">{tenant.subdomain}</TableCell>
                                 <TableCell>
-                                    <Badge
-                                        variant="outline"
-                                        className={
-                                            tenant.plan === "Enterprise"
-                                                ? "border-purple-500 text-purple-500"
-                                                : tenant.plan === "Pro"
-                                                ? "border-blue-500 text-blue-500"
-                                                : "border-slate-500 text-slate-500"
-                                        }
-                                    >
+                                    <Badge variant="outline" className={
+                                        tenant.plan === 'Enterprise' ? "border-purple-500 text-purple-500" :
+                                            tenant.plan === 'Pro' ? "border-blue-500 text-blue-500" :
+                                                "border-slate-500 text-slate-500"
+                                    }>
                                         {tenant.plan}
                                     </Badge>
                                 </TableCell>
-
                                 <TableCell>
-                                    {tenant.usersCount} /{" "}
-                                    {tenant.usersLimit === -1 ? "∞" : tenant.usersLimit}
+                                    <div className="text-sm">
+                                        {tenant.usersCount} / {tenant.usersLimit === -1 ? '∞' : tenant.usersLimit}
+                                    </div>
                                 </TableCell>
-
                                 <TableCell>
-                                    {tenant.storageUsed} / {tenant.storageLimit}
+                                    <div className="text-sm">
+                                        {tenant.storageUsed} / {tenant.storageLimit}
+                                    </div>
                                 </TableCell>
-
                                 <TableCell>
-                                    <Badge
-                                        variant={tenant.status === "active" ? "default" : "destructive"}
-                                        className={
-                                            tenant.status === "active"
-                                                ? "bg-green-600 hover:bg-green-700"
-                                                : ""
-                                        }
-                                    >
-                                        {tenant.status === "active" ? "Activo" : "Suspendido"}
+                                    <Badge variant={tenant.status === 'active' ? 'default' : 'destructive'}
+                                        className={tenant.status === 'active' ? 'bg-green-600 hover:bg-green-700' : ''}>
+                                        {tenant.status === 'active' ? 'Activo' : 'Suspendido'}
                                     </Badge>
                                 </TableCell>
-
                                 <TableCell className="text-right">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <span className="sr-only">Abrir menú</span>
                                                 <MoreHorizontal className="h-4 w-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
@@ -195,29 +211,28 @@ export function TenantsPage() {
                                             <DropdownMenuItem>
                                                 <Edit2 className="mr-2 h-4 w-4" /> Editar
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem>
-                                                <Ban className="mr-2 h-4 w-4 text-orange-500" /> Suspender
+                                            <DropdownMenuItem onClick={() => handleToggleStatus(tenant.id, tenant.status)}>
+                                                <Ban className="mr-2 h-4 w-4 text-orange-500" /> 
+                                                {tenant.status === 'active' ? 'Suspender' : 'Activar'}
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem className="text-destructive">
+                                            <DropdownMenuItem 
+                                                className="text-destructive focus:text-destructive"
+                                                onClick={() => handleDeleteTenant(tenant.id)}
+                                            >
                                                 <Trash2 className="mr-2 h-4 w-4" /> Eliminar
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        )))}
                     </TableBody>
                 </Table>
             </div>
-
             <div className="flex items-center justify-end space-x-2 py-4">
-                <Button variant="outline" size="sm" disabled>
-                    Anterior
-                </Button>
-                <Button variant="outline" size="sm" disabled>
-                    Siguiente
-                </Button>
+                <Button variant="outline" size="sm" disabled>Anterior</Button>
+                <Button variant="outline" size="sm" disabled>Siguiente</Button>
             </div>
         </div>
     );

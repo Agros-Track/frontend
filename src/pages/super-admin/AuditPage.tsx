@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import { Search, Filter } from "lucide-react";
-import { auditLogs } from "../../services/mockData";
+import { auditLogs } from "../../mock/dashboard.mock";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import {

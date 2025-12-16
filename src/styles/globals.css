@@ -1,88 +1,110 @@
+@import "tailwindcss";
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* Complete Apple-inspired color system with neutral palette and subtle accents */
   --font-size: 16px;
-  --background: #F1F1F1;
-  --foreground: #1a1a1a;
+
+  /* System Colors - Neutral palette inspired by Apple */
+  --background: #ffffff;
+  --foreground: #1d1d1f;
   --card: #ffffff;
-  --card-foreground: #1a1a1a;
+  --card-foreground: #1d1d1f;
   --popover: #ffffff;
-  --popover-foreground: #1a1a1a;
-  --primary: #3C6E47;
+  --popover-foreground: #1d1d1f;
+
+  /* Primary - Subtle blue accent (Apple-like) */
+  --primary: #0071e3;
   --primary-foreground: #ffffff;
-  --secondary: #A8D5BA;
-  --secondary-foreground: #1a1a1a;
-  --muted: #F1F1F1;
-  --muted-foreground: #6b7280;
-  --accent: #6FB4D1;
-  --accent-foreground: #ffffff;
-  --destructive: #F44336;
+
+  /* Secondary - Light gray backgrounds */
+  --secondary: #f5f5f7;
+  --secondary-foreground: #1d1d1f;
+
+  /* Muted - For subtle elements */
+  --muted: #f5f5f7;
+  --muted-foreground: #86868b;
+
+  /* Accent - Subtle highlight */
+  --accent: #f5f5f7;
+  --accent-foreground: #1d1d1f;
+
+  /* Destructive - Minimalist red */
+  --destructive: #ff3b30;
   --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.08);
-  --input: transparent;
+
+  /* Borders and inputs - Ultra subtle */
+  --border: rgba(0, 0, 0, 0.06);
+  --input: rgba(0, 0, 0, 0.06);
   --input-background: #ffffff;
-  --switch-background: #cbced4;
-  --font-weight-medium: 500;
+  --switch-background: #e5e5ea;
+
+  /* Typography weights */
+  --font-weight-light: 300;
   --font-weight-normal: 400;
-  --ring: #6FB4D1;
-  --chart-1: #6FB4D1;
-  --chart-2: #A8D5BA;
-  --chart-3: #F6A800;
-  --chart-4: #8BC34A;
-  --chart-5: #3C6E47;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Ring/Focus */
+  --ring: #0071e3;
+
+  /* Semantic colors - Minimal and elegant */
+  --success: #34c759;
+  --warning: #ff9500;
+  --info: #0071e3;
+
+  /* Chart colors - Subtle and professional */
+  --chart-1: #0071e3;
+  --chart-2: #34c759;
+  --chart-3: #ff9500;
+  --chart-4: #af52de;
+  --chart-5: #64d2ff;
+
+  /* Radius - Soft rounded corners like iOS */
   --radius: 0.75rem;
-  --sidebar: #3C6E47;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #F6A800;
-  --sidebar-primary-foreground: #1a1a1a;
-  --sidebar-accent: rgba(255, 255, 255, 0.1);
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #6FB4D1;
-  
-  --green-pastel: #A8D5BA;
-  --blue-light: #6FB4D1;
-  --orange-soft: #F6A800;
-  --green-dark: #3C6E47;
-  --green-status: #8BC34A;
-  --red-soft: #F44336;
+
+  /* Sidebar - Clean and minimal */
+  --sidebar: #fafafa;
+  --sidebar-foreground: #1d1d1f;
+  --sidebar-primary: #0071e3;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(0, 0, 0, 0.04);
+  --sidebar-accent-foreground: #1d1d1f;
+  --sidebar-border: rgba(0, 0, 0, 0.06);
+  --sidebar-ring: #0071e3;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  /* Dark mode with Apple-inspired deep blacks and subtle grays */
+  --background: #000000;
+  --foreground: #f5f5f7;
+  --card: #1c1c1e;
+  --card-foreground: #f5f5f7;
+  --popover: #1c1c1e;
+  --popover-foreground: #f5f5f7;
+  --primary: #0a84ff;
+  --primary-foreground: #ffffff;
+  --secondary: #1c1c1e;
+  --secondary-foreground: #f5f5f7;
+  --muted: #1c1c1e;
+  --muted-foreground: #98989d;
+  --accent: #2c2c2e;
+  --accent-foreground: #f5f5f7;
+  --destructive: #ff453a;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #0a84ff;
+  --sidebar: #1c1c1e;
+  --sidebar-foreground: #f5f5f7;
+  --sidebar-primary: #0a84ff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(255, 255, 255, 0.06);
+  --sidebar-accent-foreground: #f5f5f7;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #0a84ff;
 }
 
 @theme inline {
@@ -107,6 +129,9 @@
   --color-input-background: var(--input-background);
   --color-switch-background: var(--switch-background);
   --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -133,58 +158,64 @@
 
   body {
     @apply bg-background text-foreground;
+    /* Apple-style smooth font rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }
 
-/**
- * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
- */
+/* Apple-inspired typography with SF Pro-like hierarchy */
 @layer base {
-  :where(:not(:has([class*=' text-']), :not(:has([class^='text-'])))) {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
     h1 {
-      font-size: var(--text-2xl);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      font-size: 2rem;
+      font-weight: var(--font-weight-bold);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
     }
 
     h2 {
-      font-size: var(--text-xl);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      font-size: 1.5rem;
+      font-weight: var(--font-weight-semibold);
+      line-height: 1.2;
+      letter-spacing: -0.01em;
     }
 
     h3 {
-      font-size: var(--text-lg);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      font-size: 1.25rem;
+      font-weight: var(--font-weight-semibold);
+      line-height: 1.3;
+      letter-spacing: -0.01em;
     }
 
     h4 {
-      font-size: var(--text-base);
+      font-size: 1.125rem;
       font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      line-height: 1.4;
     }
 
     p {
-      font-size: var(--text-base);
+      font-size: 1rem;
       font-weight: var(--font-weight-normal);
       line-height: 1.5;
     }
 
     label {
-      font-size: var(--text-base);
+      font-size: 0.9375rem;
       font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      line-height: 1.4;
     }
 
     button {
-      font-size: var(--text-base);
+      font-size: 0.9375rem;
       font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
     }
 
     input {
-      font-size: var(--text-base);
+      font-size: 1rem;
       font-weight: var(--font-weight-normal);
       line-height: 1.5;
     }
@@ -193,4 +224,36 @@
 
 html {
   font-size: var(--font-size);
+}
+
+/* Apple-style smooth scrolling */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar styling (macOS-like) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }

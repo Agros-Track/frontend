@@ -1,123 +1,126 @@
-import { useState } from 'react'
-import { Beef, Mail, Lock, AlertCircle } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { Card } from '../ui/card'
-import { Button } from '../ui/button'
-import { Input } from '../ui/input'
-import { Label } from '../ui/label'
-import { Alert, AlertDescription } from '../ui/alert'
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
+import { Beef, Mail, Lock, AlertCircle } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { Card } from "../ui/card"
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
+import { Label } from "../ui/label"
+import { Alert, AlertDescription } from "../ui/alert"
+import { authService } from "../../services/authService"
+import { toast } from "sonner"
 
 export function Login() {
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
+    setError("")
     setIsLoading(true)
 
-    setTimeout(() => {
-      if (email === 'alex@gmail.com' && password === '1234') {
-        localStorage.setItem('userRole', 'admin')
-        localStorage.setItem('userEmail', email)
-        const hasOnboarded = localStorage.getItem('hasOnboarded')
+    try {
+      console.log("🔐 Intentando login con:", email);
+
+      const response = await authService.login({ email, password });
+
+      console.log("✅ Login exitoso:", response);
+
+      // Guardar información del usuario
+      localStorage.setItem("userRole", response.user.role);
+      localStorage.setItem("userEmail", response.user.email);
+      localStorage.setItem("userName", response.user.name);
+      localStorage.setItem("userId", response.user.id);
+
+      toast.success(`Bienvenido, ${response.user.name}`);
+
+      // Redirigir según el rol
+      const role = response.user.role.toLowerCase();
+
+      if (role === "super-admin" || role === "superadmin") {
+        navigate("/super-admin");
+      } else if (role === "admin") {
+        const hasOnboarded = localStorage.getItem("hasOnboarded");
         if (!hasOnboarded) {
-          localStorage.setItem('hasOnboarded', 'true')
-          navigate('/onboarding')
+          localStorage.setItem("hasOnboarded", "true");
+          navigate("/onboarding");
         } else {
-          navigate('/admin')
+          navigate("/admin");
         }
-        return
+      } else if (role === "veterinarian" || role === "veterinario") {
+        navigate("/veterinario");
+      } else if (role === "worker") {
+        navigate("/worker");
+      } else {
+        navigate("/admin"); // Default fallback
       }
+    } catch (error: any) {
+      console.error("❌ Error en login:", error);
 
-      if (email === 'jose@gmail.com' && password === '1234') {
-        localStorage.setItem('userRole', 'super-admin')
-        localStorage.setItem('userEmail', email)
-        navigate('/super-admin')
-        return
-      }
+      const errorMessage = error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Credenciales inválidas. Por favor intenta de nuevo.";
 
-      if (email === 'carlos@gmail.com' && password === '1234') {
-        localStorage.setItem('userRole', 'veterinario')
-        localStorage.setItem('userEmail', email)
-        navigate('/veterinario')
-        return
-      }
-
-      if (email === 'juan@gmail.com' && password === '1234') {
-        localStorage.setItem('userRole', 'worker')
-        localStorage.setItem('userEmail', email)
-        navigate('/worker')
-        return
-      }
-
-      setError('Credenciales inválidas. Por favor intenta de nuevo.')
-      setIsLoading(false)
-    }, 600)
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 opacity-10 rounded-full blur-3xl" style={{ backgroundColor: 'var(--green-pastel)' }} />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 opacity-10 rounded-full blur-3xl" style={{ backgroundColor: 'var(--blue-light)' }} />
-      </div>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+      {/* Subtle background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-muted/30 to-background pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10">
-        <Card className="bg-card shadow-xl border-border overflow-hidden">
-          {/* Header with Gradient */}
-          <div className="p-8 text-white relative overflow-hidden" style={{ backgroundImage: 'linear-gradient(to right, var(--green-dark), var(--green-pastel))' }}>
-            <div className="absolute inset-0 opacity-5">
-              <div className="absolute -top-20 -right-20 w-40 h-40 bg-white rounded-full blur-2xl" />
+        <Card className="bg-card shadow-2xl border border-border/50 overflow-hidden backdrop-blur-xl">
+          {/* Minimalist header */}
+          <div className="p-10 text-center border-b border-border/50">
+            <div className="mx-auto mb-6 w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center">
+              <Beef className="h-8 w-8 text-primary" />
             </div>
-
-            <div className="relative z-10 text-center space-y-4">
-              <div className="mx-auto w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-lg">
-                <Beef className="h-8 w-8" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold">AgroTrack</h1>
-                <p className="text-white/80 text-sm">Sistema de Gestión Ganadera</p>
-              </div>
-            </div>
+            <h1 className="text-2xl font-semibold text-foreground mb-2 tracking-tight">AgroTrack</h1>
+            <p className="text-sm text-muted-foreground">Sistema de Gestión Ganadera</p>
           </div>
 
-          {/* Form Content */}
-          <div className="p-8 space-y-6">
-            {/* Welcome Section */}
-            <div className="text-center space-y-2">
-              <h2 className="text-xl font-semibold text-foreground">Bienvenido</h2>
-              <p className="text-sm text-muted-foreground">
-                Accede a tu cuenta para continuar
-              </p>
+          {/* Form content */}
+          <div className="p-10 space-y-6">
+            {/* Welcome message */}
+            <div className="text-center space-y-1">
+              <h2 className="text-xl font-semibold text-foreground tracking-tight">Bienvenido</h2>
+              <p className="text-sm text-muted-foreground">Ingresa tus credenciales para continuar</p>
             </div>
 
-            {/* Error Alert */}
+            {/* Error alert */}
             {error && (
-              <Alert variant="destructive" className="border-0 bg-destructive/10">
+              <Alert variant="destructive" className="border-0 bg-destructive/10 rounded-xl">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription className="text-destructive">{error}</AlertDescription>
+                <AlertDescription className="text-destructive text-sm">{error}</AlertDescription>
               </Alert>
             )}
 
             {/* Form */}
-            <form onSubmit={handleLogin} className="space-y-4">
-              {/* Email Field */}
+            <form onSubmit={handleLogin} className="space-y-5">
+              {/* Email field */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">
+                <Label htmlFor="email" className="text-sm font-medium text-foreground">
                   Correo Electrónico
                 </Label>
-                <div className="relative group">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                <div className="relative">
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
                     placeholder="tu@email.com"
-                    className="pl-10 h-11 bg-background/50 border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    className="pl-11 h-12 bg-muted/50 border-border rounded-xl focus:bg-background transition-colors"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -125,10 +128,10 @@ export function Login() {
                 </div>
               </div>
 
-              {/* Password Field */}
+              {/* Password field */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-sm font-medium">
+                  <Label htmlFor="password" className="text-sm font-medium text-foreground">
                     Contraseña
                   </Label>
                   <button
@@ -138,13 +141,13 @@ export function Login() {
                     ¿Olvidaste tu contraseña?
                   </button>
                 </div>
-                <div className="relative group">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-muted-foreground" />
                   <Input
                     id="password"
                     type="password"
                     placeholder="••••••••"
-                    className="pl-10 h-11 bg-background/50 border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    className="pl-11 h-12 bg-muted/50 border-border rounded-xl focus:bg-background transition-colors"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -152,14 +155,11 @@ export function Login() {
                 </div>
               </div>
 
-              {/* Submit Button */}
+              {/* Submit button */}
               <Button
                 type="submit"
                 disabled={isLoading || !email || !password}
-                className="w-full h-11 text-white font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
-                style={{
-                  backgroundImage: 'linear-gradient(to right, var(--green-dark), var(--green-pastel))',
-                }}
+                className="w-full h-12 text-white font-semibold shadow-lg hover:shadow-xl bg-primary hover:bg-primary/90"
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
@@ -167,112 +167,76 @@ export function Login() {
                     <span>Iniciando sesión...</span>
                   </div>
                 ) : (
-                  'Iniciar Sesión'
+                  "Iniciar Sesión"
                 )}
               </Button>
             </form>
 
             {/* Divider */}
-            <div className="relative">
+            <div className="relative py-2">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="px-2 bg-card text-muted-foreground">Credenciales de Prueba</span>
+                <span className="px-3 bg-card text-muted-foreground">Credenciales de Prueba</span>
               </div>
             </div>
 
-            {/* Test Credentials */}
-            <div className="space-y-3">
+            {/* Test credentials */}
+            <div className="space-y-2">
               <button
                 onClick={() => {
-                  setEmail('alex@gmail.com')
-                  setPassword('1234')
+                  setEmail("superadmin@agrotrack.com")
+                  setPassword("1234")
                 }}
-                className="w-full p-3 rounded-lg hover:opacity-80 transition-colors text-left group"
-                style={{
-                  backgroundColor: 'rgba(168, 213, 186, 0.1)',
-                  borderColor: 'var(--green-pastel)',
-                  borderWidth: '1px'
-                }}
+                className="w-full p-3.5 rounded-xl hover:bg-muted/50 transition-all text-left border border-border/50 bg-muted/20"
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold text-primary">ADMINISTRADOR</p>
-                    <p className="text-xs text-muted-foreground font-mono mt-1">alex@gmail.com</p>
-                  </div>
-                </div>
+                <p className="text-xs font-semibold text-warning mb-1">SUPER ADMIN</p>
+                <p className="text-xs text-muted-foreground font-mono">superadmin@agrotrack.com</p>
               </button>
 
               <button
                 onClick={() => {
-                  setEmail('jose@gmail.com')
-                  setPassword('1234')
+                  setEmail("admin.esperanza@agrotrack.com")
+                  setPassword("1234")
                 }}
-                className="w-full p-3 rounded-lg hover:opacity-80 transition-colors text-left group"
-                style={{
-                  backgroundColor: 'rgba(246, 168, 0, 0.1)',
-                  borderColor: 'var(--orange-soft)',
-                  borderWidth: '1px'
-                }}
+                className="w-full p-3.5 rounded-xl hover:bg-muted/50 transition-all text-left border border-border/50 bg-muted/20"
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold" style={{ color: 'var(--orange-soft)' }}>SUPER ADMIN</p>
-                    <p className="text-xs text-muted-foreground font-mono mt-1">jose@gmail.com</p>
-                  </div>
-                </div>
+                <p className="text-xs font-semibold text-primary mb-1">ADMINISTRADOR</p>
+                <p className="text-xs text-muted-foreground font-mono">admin.esperanza@agrotrack.com</p>
               </button>
 
               <button
                 onClick={() => {
-                  setEmail('carlos@gmail.com')
-                  setPassword('1234')
+                  setEmail("vet.prado@agrotrack.com")
+                  setPassword("1234")
                 }}
-                className="w-full p-3 rounded-lg hover:opacity-80 transition-colors text-left group"
-                style={{
-                  backgroundColor: 'rgba(111, 180, 209, 0.1)',
-                  borderColor: 'var(--blue-light)',
-                  borderWidth: '1px'
-                }}
+                className="w-full p-3.5 rounded-xl hover:bg-muted/50 transition-all text-left border border-border/50 bg-muted/20"
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold" style={{ color: 'var(--blue-light)' }}>VETERINARIO</p>
-                    <p className="text-xs text-muted-foreground font-mono mt-1">carlos@gmail.com</p>
-                  </div>
-                </div>
+                <p className="text-xs font-semibold text-info mb-1">VETERINARIO</p>
+                <p className="text-xs text-muted-foreground font-mono">vet.prado@agrotrack.com</p>
               </button>
 
               <button
                 onClick={() => {
-                  setEmail('juan@gmail.com')
-                  setPassword('1234')
+                  setEmail("worker1.demo@agrotrack.com")
+                  setPassword("1234")
                 }}
-                className="w-full p-3 rounded-lg hover:opacity-80 transition-colors text-left group"
-                style={{
-                  backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                  borderColor: 'rgb(139, 92, 246)',
-                  borderWidth: '1px'
-                }}
+                className="w-full p-3.5 rounded-xl hover:bg-muted/50 transition-all text-left border border-border/50 bg-muted/20"
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold" style={{ color: 'rgb(139, 92, 246)' }}>TRABAJADOR</p>
-                    <p className="text-xs text-muted-foreground font-mono mt-1">juan@gmail.com</p>
-                  </div>
-                </div>
+                <p className="text-xs font-semibold text-foreground mb-1">TRABAJADOR</p>
+                <p className="text-xs text-muted-foreground font-mono">worker1.demo@agrotrack.com</p>
               </button>
             </div>
 
-            {/* Info Text */}
-            <p className="text-xs text-muted-foreground text-center">
-              Contraseña para ambas cuentas: <span className="font-mono font-semibold">1234</span>
+            {/* Info text */}
+            <p className="text-xs text-muted-foreground text-center pt-2">
+              Contraseña para todas las cuentas: <span className="font-mono font-semibold">1234</span>
             </p>
           </div>
 
           {/* Footer */}
-          <div className="px-8 py-4 bg-muted/30 border-t border-border text-center">
+          <div className="px-10 py-5 bg-muted/20 border-t border-border/50 text-center">
             <p className="text-xs text-muted-foreground">
               © {new Date().getFullYear()} AgroTrack. Todos los derechos reservados.
             </p>

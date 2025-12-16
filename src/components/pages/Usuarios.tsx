@@ -5,7 +5,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Plus, Users, Shield, Lock, Mail, MoreVertical, Ban, CheckCircle } from 'lucide-react';
-import { mockUsers, User } from '../../utils/mockData';
+import { mockUsers, User } from '../../mock/mockData';
 import {
   Select,
   SelectContent,

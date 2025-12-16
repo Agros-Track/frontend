@@ -5,7 +5,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Plus, Milk, Scale, TrendingUp, Calendar } from 'lucide-react';
-import { mockAnimals, mockProductionData, mockWeightData } from '../../utils/mockData';
+import { mockAnimals, mockProductionData, mockWeightData } from '../../mock/mockData';
 import {
   Select,
   SelectContent,

@@ -1,4 +1,3 @@
-
 import { createBrowserRouter } from "react-router-dom";
 import { MainLayout } from "../components/MainLayout";
 import { Dashboard } from "../components/pages/Dashboard";

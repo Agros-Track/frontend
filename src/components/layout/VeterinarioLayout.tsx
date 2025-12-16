@@ -1,13 +1,8 @@
+"use client"
+
 import { Outlet } from "react-router"
 import { useState } from "react"
-import {
-  Stethoscope,
-  Syringe,
-  AlertCircle,
-  LogOut,
-  Menu,
-  X,
-} from "lucide-react"
+import { Stethoscope, Syringe, AlertCircle, LogOut, Menu, X } from "lucide-react"
 import { Button } from "../ui/button"
 import { Link, useLocation } from "react-router-dom"
 
@@ -25,11 +20,11 @@ export function VeterinarioLayout() {
     <div className="min-h-screen bg-background">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-[var(--sidebar)] px-6 pb-4 shadow-lg">
-          <div className="flex h-16 shrink-0 items-center border-b border-[var(--sidebar-border)]">
+        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-sidebar px-4 pb-4 border-r border-sidebar-border">
+          <div className="flex h-16 shrink-0 items-center px-2 border-b border-sidebar-border">
             <div className="flex flex-col">
-              <h2 className="text-[var(--sidebar-foreground)] text-lg font-semibold">AgroTrack</h2>
-              <span className="text-xs text-[var(--sidebar-foreground)]/70">Veterinario</span>
+              <h2 className="text-sidebar-foreground text-lg font-semibold tracking-tight">AgroTrack</h2>
+              <span className="text-xs text-sidebar-foreground/70 font-medium">Veterinario</span>
             </div>
           </div>
           <nav className="flex flex-1 flex-col">
@@ -38,22 +33,21 @@ export function VeterinarioLayout() {
                 const Icon = item.icon
                 const isActive =
                   location.pathname === item.path ||
-                  (item.path !== "/veterinario" &&
-                    location.pathname.startsWith(item.path))
+                  (item.path !== "/veterinario" && location.pathname.startsWith(item.path))
                 return (
                   <li key={item.path}>
                     <Link
                       to={item.path}
                       className={`
-                        group flex gap-x-3 rounded-xl px-3 py-2.5 transition-all
+                        group flex gap-x-3 rounded-xl px-3 py-2.5 transition-all text-[15px] font-medium
                         ${
                           isActive
-                            ? "bg-[var(--sidebar-primary)] text-[var(--sidebar-primary-foreground)] shadow-md"
-                            : "text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
+                            ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+                            : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                         }
                       `}
                     >
-                      <Icon className="h-5 w-5 shrink-0" />
+                      <Icon className="h-[18px] w-[18px] shrink-0" />
                       <span>{item.label}</span>
                     </Link>
                   </li>
@@ -61,13 +55,13 @@ export function VeterinarioLayout() {
               })}
             </ul>
           </nav>
-          <div className="mt-auto pt-4 border-t border-[var(--sidebar-border)]">
+          <div className="mt-auto pt-4 border-t border-sidebar-border">
             <Button
               variant="ghost"
-              className="w-full justify-start gap-x-3 text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
+              className="w-full justify-start gap-x-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-xl"
               onClick={() => (window.location.href = "/")}
             >
-              <LogOut className="h-5 w-5 shrink-0" />
+              <LogOut className="h-[18px] w-[18px] shrink-0" />
               <span>Cerrar Sesión</span>
             </Button>
           </div>
@@ -81,22 +75,19 @@ export function VeterinarioLayout() {
           ${sidebarOpen ? "block" : "hidden"}
         `}
       >
-        <div
-          className="fixed inset-0 bg-black/50"
-          onClick={() => setSidebarOpen(false)}
-        />
-        <aside className="fixed inset-y-0 left-0 w-64 bg-[var(--sidebar)] shadow-2xl">
-          <div className="flex h-full flex-col gap-y-5 overflow-y-auto px-6 pb-4">
-            <div className="flex h-16 shrink-0 items-center justify-between border-b border-[var(--sidebar-border)]">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+        <aside className="fixed inset-y-0 left-0 w-72 bg-sidebar shadow-2xl">
+          <div className="flex h-full flex-col gap-y-5 overflow-y-auto px-4 pb-4">
+            <div className="flex h-16 shrink-0 items-center justify-between px-2 border-b border-sidebar-border">
               <div className="flex flex-col">
-                <h2 className="text-[var(--sidebar-foreground)] text-lg font-semibold">AgroTrack</h2>
-                <span className="text-xs text-[var(--sidebar-foreground)]/70">Veterinario</span>
+                <h2 className="text-sidebar-foreground text-lg font-semibold tracking-tight">AgroTrack</h2>
+                <span className="text-xs text-sidebar-foreground/70 font-medium">Veterinario</span>
               </div>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setSidebarOpen(false)}
-                className="text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)]"
+                className="text-sidebar-foreground hover:bg-sidebar-accent rounded-xl"
               >
                 <X className="h-5 w-5" />
               </Button>
@@ -107,23 +98,22 @@ export function VeterinarioLayout() {
                   const Icon = item.icon
                   const isActive =
                     location.pathname === item.path ||
-                    (item.path !== "/veterinario" &&
-                      location.pathname.startsWith(item.path))
+                    (item.path !== "/veterinario" && location.pathname.startsWith(item.path))
                   return (
                     <li key={item.path}>
                       <Link
                         to={item.path}
                         onClick={() => setSidebarOpen(false)}
                         className={`
-                          group flex gap-x-3 rounded-xl px-3 py-2.5 transition-all
+                          group flex gap-x-3 rounded-xl px-3 py-2.5 transition-all text-[15px] font-medium
                           ${
                             isActive
-                              ? "bg-[var(--sidebar-primary)] text-[var(--sidebar-primary-foreground)] shadow-md"
-                              : "text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
+                              ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+                              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                           }
                         `}
                       >
-                        <Icon className="h-5 w-5 shrink-0" />
+                        <Icon className="h-[18px] w-[18px] shrink-0" />
                         <span>{item.label}</span>
                       </Link>
                     </li>
@@ -131,13 +121,13 @@ export function VeterinarioLayout() {
                 })}
               </ul>
             </nav>
-            <div className="mt-auto pt-4 border-t border-[var(--sidebar-border)]">
+            <div className="mt-auto pt-4 border-t border-sidebar-border">
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-x-3 text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
+                className="w-full justify-start gap-x-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-xl"
                 onClick={() => (window.location.href = "/")}
               >
-                <LogOut className="h-5 w-5 shrink-0" />
+                <LogOut className="h-[18px] w-[18px] shrink-0" />
                 <span>Cerrar Sesión</span>
               </Button>
             </div>
@@ -148,19 +138,15 @@ export function VeterinarioLayout() {
       {/* Main Content */}
       <div className="lg:pl-64">
         {/* Mobile Header */}
-        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-border bg-card px-4 shadow-sm lg:hidden">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSidebarOpen(true)}
-          >
+        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-border bg-card/80 backdrop-blur-xl px-4 lg:hidden">
+          <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)} className="rounded-xl">
             <Menu className="h-5 w-5" />
           </Button>
-          <h1 className="text-primary">AgroTrack</h1>
+          <h1 className="text-primary text-lg font-semibold tracking-tight">AgroTrack</h1>
         </div>
 
         {/* Page Content */}
-        <main className="py-6 px-4 sm:px-6 lg:px-8">
+        <main className="py-8 px-4 sm:px-6 lg:px-8">
           <Outlet />
         </main>
       </div>

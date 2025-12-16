@@ -2,7 +2,7 @@ import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Baby, Calendar, Syringe, Heart } from 'lucide-react';
-import { mockAnimals } from '../../utils/mockData';
+import { mockAnimals } from '../../mock/mockData';
 
 export function Reproduccion() {
   const preñadas = mockAnimals.filter(a => a.state === 'preñada');

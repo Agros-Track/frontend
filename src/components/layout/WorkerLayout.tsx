@@ -4,6 +4,7 @@ import { Outlet } from "react-router"
 import { useState } from "react"
 import { LayoutDashboard, Beef, Milk, Utensils, ClipboardList, Bell, Menu, X, LogOut, Search } from "lucide-react"
 import { Button } from "../ui/button"
+import { NotificationsPopover } from "../ui/notifications-popover"
 import { Link, useLocation } from "react-router"
 import { Input } from "../ui/input"
 
@@ -44,10 +45,9 @@ export function WorkerLayout() {
                       to={item.url}
                       className={`
                         group flex gap-x-3 rounded-xl px-3 py-2.5 transition-all text-[15px] font-medium
-                        ${
-                          isActive
-                            ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
-                            : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                        ${isActive
+                          ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+                          : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                         }
                       `}
                     >
@@ -116,10 +116,9 @@ export function WorkerLayout() {
                         onClick={() => setSidebarOpen(false)}
                         className={`
                           group flex gap-x-3 rounded-xl px-3 py-2.5 transition-all text-[15px] font-medium
-                          ${
-                            isActive
-                              ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
-                              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                          ${isActive
+                            ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+                            : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                           }
                         `}
                       >
@@ -163,10 +162,7 @@ export function WorkerLayout() {
               />
             </div>
             <div className="flex items-center gap-x-4 lg:gap-x-6">
-              <button className="relative p-2 rounded-xl hover:bg-muted transition-colors">
-                <Bell className="h-5 w-5 text-muted-foreground" />
-                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-primary"></span>
-              </button>
+              <NotificationsPopover />
             </div>
           </div>
         </div>

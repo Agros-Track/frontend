@@ -41,7 +41,7 @@ export function Login() {
       toast.success(`Bienvenido, ${response.user.name}`);
 
       // Redirigir según el rol
-      const role = response.user.role.toLowerCase();
+      const role = response.user?.role?.toLowerCase() || "";
 
       if (role === "super-admin" || role === "superadmin") {
         navigate("/super-admin");

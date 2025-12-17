@@ -7,12 +7,16 @@ export interface LoginRequest {
 }
 
 export interface AuthResponse {
-  token: string;
+  accessToken: string;
   user: {
     id: string;
     name: string;
     email: string;
-    role: string;
+    role: {
+      name:string,
+      role_id: number,
+      slug: string
+    }
   };
 }
 
@@ -21,8 +25,8 @@ export const authService = {
   login: async (data: LoginRequest) => {
     const response = await api.post<AuthResponse>('/auth/login', data);
     // Store token in localStorage
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
+    if (response.data.accessToken) {
+      localStorage.setItem('token', response.data.accessToken);
     }
     return response.data;
   },

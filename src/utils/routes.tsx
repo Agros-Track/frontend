@@ -16,6 +16,8 @@ import { WorkerLayout } from "../components/layout/WorkerLayout";
 import { WorkerDashboard } from "../pages/worker/DashboardPage";
 import { Vacunas } from "../components/pages/Vacunas";
 import { Enfermedades } from "../components/pages/Enfermedades";
+import { TenantsPage } from "../pages/super-admin/tenants/TenantsPage";
+
 
 export const router = createBrowserRouter([
   {
@@ -55,11 +57,7 @@ export const router = createBrowserRouter([
         }
       },
       {
-        path: "tenants",
-        async lazy() {
-          let { TenantsPage } = await import("../pages/super-admin/tenants/TenantsPage");
-          return { Component: TenantsPage };
-        }
+        path: "tenants", Component: TenantsPage 
       },
       {
         path: "tenants/:id",

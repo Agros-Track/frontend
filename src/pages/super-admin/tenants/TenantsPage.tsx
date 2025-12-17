@@ -40,10 +40,13 @@ export function TenantsPage() {
         try {
             setIsLoading(true);
             const data = await tenantService.getTenants();
+            console.log({data});
+            
             setTenants(data);
         } catch (error) {
             console.error('Error loading tenants:', error);
             toast.error("Error al cargar los tenants.");
+            alert(error)
         } finally {
             setIsLoading(false);
         }
@@ -157,7 +160,7 @@ export function TenantsPage() {
                                 <TableCell>
                                     <div className="flex items-center gap-3">
                                         <Avatar className="h-9 w-9 rounded-lg">
-                                            <AvatarImage src={tenant.logo} />
+                                            <AvatarImage src={tenant.logo || "none"} />
                                             <AvatarFallback>{tenant.name.substring(0, 2)}</AvatarFallback>
                                         </Avatar>
                                         <div className="flex flex-col">

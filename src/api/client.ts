@@ -21,6 +21,7 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+    
     // Log para debugging
     console.log(`📤 ${config.method?.toUpperCase()} ${config.url}`, config.data);
 
@@ -61,7 +62,7 @@ api.interceptors.response.use(
         case 401:
           toast.error("Sesión expirada. Por favor inicia sesión nuevamente.");
           localStorage.removeItem("token");
-          window.location.href = "/login";
+          window.location.href = "/";
           break;
         case 403:
           toast.error("No tienes permisos para realizar esta acción.");

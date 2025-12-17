@@ -33,7 +33,7 @@ export function Login() {
       console.log("✅ Login exitoso:", response);
 
       // Guardar información del usuario
-      localStorage.setItem("userRole", response.user.role);
+      localStorage.setItem("userRole", response.user.role.slug);
       localStorage.setItem("userEmail", response.user.email);
       localStorage.setItem("userName", response.user.name);
       localStorage.setItem("userId", response.user.id);
@@ -41,25 +41,28 @@ export function Login() {
       toast.success(`Bienvenido, ${response.user.name}`);
 
       // Redirigir según el rol
-      const role = response.user?.role?.toLowerCase() || "";
+      const role = response.user?.role?.slug || "";
 
-      if (role === "super-admin" || role === "superadmin") {
+      if (role === "SUPER_ADMIN") {
         navigate("/super-admin");
-      } else if (role === "admin") {
+
+      } else if (role === "ADMIN_TENANT") {
         const hasOnboarded = localStorage.getItem("hasOnboarded");
+        
         if (!hasOnboarded) {
           localStorage.setItem("hasOnboarded", "true");
           navigate("/onboarding");
         } else {
           navigate("/admin");
         }
-      } else if (role === "veterinarian" || role === "veterinario") {
+      
+      } else if (role === "VETERINARIO") {
         navigate("/veterinario");
-      } else if (role === "worker") {
+      
+      } else if ( role === "TRABAJADOR") {
         navigate("/worker");
-      } else {
-        navigate("/admin"); // Default fallback
       }
+    
     } catch (error: any) {
       console.error("❌ Error en login:", error);
 
@@ -187,7 +190,7 @@ export function Login() {
               <button
                 onClick={() => {
                   setEmail("superadmin@agrotrack.com")
-                  setPassword("1234")
+                  setPassword("Supersecret123")
                 }}
                 className="w-full p-3.5 rounded-xl hover:bg-muted/50 transition-all text-left border border-border/50 bg-muted/20"
               >
@@ -198,7 +201,7 @@ export function Login() {
               <button
                 onClick={() => {
                   setEmail("admin.esperanza@agrotrack.com")
-                  setPassword("1234")
+                  setPassword("Supersecret123")
                 }}
                 className="w-full p-3.5 rounded-xl hover:bg-muted/50 transition-all text-left border border-border/50 bg-muted/20"
               >
@@ -209,7 +212,7 @@ export function Login() {
               <button
                 onClick={() => {
                   setEmail("vet.prado@agrotrack.com")
-                  setPassword("1234")
+                  setPassword("Supersecret123")
                 }}
                 className="w-full p-3.5 rounded-xl hover:bg-muted/50 transition-all text-left border border-border/50 bg-muted/20"
               >
@@ -220,7 +223,7 @@ export function Login() {
               <button
                 onClick={() => {
                   setEmail("worker1.demo@agrotrack.com")
-                  setPassword("1234")
+                  setPassword("Supersecret123")
                 }}
                 className="w-full p-3.5 rounded-xl hover:bg-muted/50 transition-all text-left border border-border/50 bg-muted/20"
               >

@@ -39,7 +39,7 @@ export interface Tenant {
 // 🔹 LISTAR TENANTS
 export const getTenants = async (): Promise<Tenant[]> => {
   try {
-    const response = await api.get("/tenants");
+    const response = await api.get("/tenant");
     console.log("✅ Tenants loaded:", response.data.length);
     return response.data;
   } catch (error: any) {
@@ -50,7 +50,7 @@ export const getTenants = async (): Promise<Tenant[]> => {
 
 // 🔹 OBTENER TENANT POR ID
 export const getTenantById = async (id: string): Promise<Tenant> => {
-  const response = await api.get(`/tenants/${id}`);
+  const response = await api.get(`/tenant/${id}`);
   return response.data;
 };
 
@@ -59,7 +59,7 @@ export const createTenant = async (payload: CreateTenantPayload): Promise<Tenant
   console.log("🚀 Creating tenant with payload:", payload);
   
   try {
-    const response = await api.post("/tenants", payload);
+    const response = await api.post("/tenant", payload);
     console.log("✅ Tenant created successfully:", response.data);
     return response.data;
   } catch (error: any) {
@@ -70,17 +70,17 @@ export const createTenant = async (payload: CreateTenantPayload): Promise<Tenant
 
 // 🔹 ACTUALIZAR TENANT
 export const updateTenant = async (id: string, payload: Partial<CreateTenantPayload>): Promise<Tenant> => {
-  const response = await api.put(`/tenants/${id}`, payload);
+  const response = await api.put(`/tenant/${id}`, payload);
   return response.data;
 };
 
 // 🔹 ELIMINAR TENANT
 export const deleteTenant = async (id: string): Promise<void> => {
-  await api.delete(`/tenants/${id}`);
+  await api.delete(`/tenant/${id}`);
 };
 
 // 🔹 SUSPENDER/ACTIVAR TENANT
 export const toggleTenantStatus = async (id: string, status: "active" | "suspended"): Promise<Tenant> => {
-  const response = await api.patch(`/tenants/${id}/status`, { status });
+  const response = await api.patch(`/tenant/${id}/status`, { status });
   return response.data;
 };
